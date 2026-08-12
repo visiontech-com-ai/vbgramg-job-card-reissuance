@@ -1,7 +1,7 @@
 /*!
  * ┌─────────────────────────────────────────────────────────┐
- * │  VisionTech · VBG-RAM-G Auto Processor                   │
- * │  Bulk Job Card marking for the Rozgar & Ajeevika portal  │
+ * │  VisionTech · VBG-RAM-G Auto Processor                  │
+ * │  Bulk Job Card marking for the Rozgar & Ajeevika portal │
  * └─────────────────────────────────────────────────────────┘
  */
 (async () => {
