@@ -9,7 +9,7 @@ Instead of ticking 10 checkboxes, clicking **Update**, clicking **OK**, and
 repeating that hundreds of times, you run this once and let it work through
 every page, every village, and every panchayat on its own.
 
-📖 **[Read the step-by-step guide →](https://visiontech-com-ai.github.io/vbgramg-job-card-reissueance/)**
+📖 **[Read the step-by-step guide →](https://visiontech-com-ai.github.io/vbgramg-job-card-reissuance/)**
 
 ---
 
@@ -48,7 +48,7 @@ If you've done this kind of thing before, the short version is:
 6. A box asks which panchayats — type `ALL` or a number like `7`
 7. Leave the tab open and visible. Don't click on the page.
 
-**New to this? Follow the [full illustrated guide](https://visiontech-com-ai.github.io/vbgramg-job-card-reissueance/)
+**New to this? Follow the [full illustrated guide](https://visiontech-com-ai.github.io/vbgramg-job-card-reissuance/)
 instead — it explains every step with pictures.**
 
 ## Choosing panchayats
