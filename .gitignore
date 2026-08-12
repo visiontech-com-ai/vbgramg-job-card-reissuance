@@ -1,0 +1,13 @@
+# Never commit saved copies of the portal. They contain ViewState and
+# session-derived markup, and are not ours to redistribute.
+*.aspx
+*.aspx.html
+VB-G RAM G*
+*_files/
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
