@@ -43,7 +43,9 @@ If you've done this kind of thing before, the short version is:
    (the flag-with-a-slash icon). ⚠️ **Don't skip this** — the portal has
    `debugger` statements that will freeze the page.
 3. **Sources** → **Snippets** → **+ New snippet** → name it `vbgramg`
-4. Paste all of [`auto.js`](auto.js) → <kbd>Ctrl</kbd>+<kbd>S</kbd> to save
+4. Paste all of [`auto.js`](auto.js) — or
+   [download it](https://github.com/visiontech-com-ai/vbgramg-job-card-reissuance/releases/latest/download/auto.js)
+   — then <kbd>Ctrl</kbd>+<kbd>S</kbd> to save
 5. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run
 6. A box asks which panchayats — type `ALL` or a number like `7`
 7. Leave the tab open and visible. Don't click on the page.

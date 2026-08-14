@@ -44,6 +44,11 @@
   a.pill.btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(0,0,0,.25)}
   a.pill.btn:active{transform:none}
   a.pill.btn svg{width:15px;height:15px;flex:none}
+  /* Download total. Tabular numerals so the button doesn't jitter as the
+     number grows, and hidden until a real value arrives. */
+  a.pill.btn .count{padding-left:9px;margin-left:2px;border-left:1px solid rgba(11,61,145,.22);
+    color:#4a6291;font-weight:600;font-variant-numeric:tabular-nums}
+  a.pill.btn .count[hidden]{display:none}
 
   /* ── layout ── */
   main{padding:36px 0 64px}
@@ -134,14 +139,17 @@
       each one. This guide walks you through it from scratch — no coding needed.
     </p>
     <div class="meta">
+      <!-- Points at the latest Release asset, not the raw file: release assets
+           are served as attachments (so a plain link downloads, no `download`
+           attribute needed) and they're the only thing GitHub counts. -->
       <a class="pill btn" id="dl"
-         href="https://raw.githubusercontent.com/visiontech-com-ai/vbgramg-job-card-reissuance/main/auto.js"
-         download="auto.js">
+         href="https://github.com/visiontech-com-ai/vbgramg-job-card-reissuance/releases/latest/download/auto.js">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M8 1.8v8.4"/><path d="M4.6 7l3.4 3.4L11.4 7"/><path d="M2.4 13.4h11.2"/>
         </svg>
         <span class="lbl">Download auto.js</span>
+        <span class="count" id="dlcount" hidden></span>
       </a>
       <span class="pill">⏱️ Setup takes ~5 minutes</span>
       <span class="pill">🖥️ Google Chrome only</span>
@@ -544,49 +552,56 @@
 </footer>
 
 <script>
-// The download button points at raw.githubusercontent, and browsers ignore the
-// `download` attribute on cross-origin links — a plain click would just display
-// the script as text. So fetch it and save from a same-origin blob instead.
-// raw.githubusercontent sends Access-Control-Allow-Origin:*, so this is allowed,
-// and it always serves the current version — no second copy to keep in sync.
+// Shows the total number of auto.js downloads next to the button.
+//
+// The download itself needs no JavaScript — the release asset is served with
+// Content-Disposition: attachment, so the plain link handles it. (Don't be
+// tempted to fetch() the asset: release asset URLs send no CORS headers, so it
+// would be blocked. The API below is a different host and does allow it.)
+//
+// The count is summed across ALL releases rather than read from the latest one,
+// because download_count lives on the asset record — publishing a new release
+// starts a fresh counter, so only the sum is a stable running total.
 (function () {
-  var btn = document.getElementById('dl');
-  if (!btn) return;
-  var lbl = btn.querySelector('.lbl');
-  var idle = lbl.textContent;
-  var busy = false;
+  var el = document.getElementById('dlcount');
+  if (!el) return;
 
-  btn.addEventListener('click', function (e) {
-    if (busy) { e.preventDefault(); return; }
-    busy = true;
-    e.preventDefault();
-    lbl.textContent = 'Downloading…';
+  var API = 'https://api.github.com/repos/visiontech-com-ai/vbgramg-job-card-reissuance/releases';
+  var KEY = 'vbg-dl-count';
 
-    fetch(btn.href, { cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.blob();
-      })
-      .then(function (blob) {
-        var url = URL.createObjectURL(blob);
-        var tmp = document.createElement('a');
-        tmp.href = url;
-        tmp.download = 'auto.js';
-        document.body.appendChild(tmp);
-        tmp.click();
-        tmp.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
-        lbl.textContent = 'Saved ✓';
-        setTimeout(function () { lbl.textContent = idle; busy = false; }, 2500);
-      })
-      .catch(function () {
-        // Offline, blocked, or GitHub unreachable: fall back to opening the raw
-        // file so the user can still copy it by hand.
-        lbl.textContent = idle;
-        busy = false;
-        window.open(btn.href, '_blank', 'noopener');
+  function render(n) {
+    if (typeof n !== 'number' || !isFinite(n) || n < 1) return;   // hide 0 / junk
+    el.textContent = n.toLocaleString();
+    el.title = n.toLocaleString() + ' download' + (n === 1 ? '' : 's') + ' of auto.js';
+    el.hidden = false;
+  }
+
+  // Unauthenticated API calls are capped at 60/hour per IP, so don't re-ask on
+  // every page view within a session.
+  try {
+    var cached = sessionStorage.getItem(KEY);
+    if (cached !== null) { render(parseInt(cached, 10)); return; }
+  } catch (e) { /* private mode — just fetch */ }
+
+  fetch(API, { headers: { Accept: 'application/vnd.github+json' } })
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function (releases) {
+      var total = 0;
+      (releases || []).forEach(function (rel) {
+        (rel.assets || []).forEach(function (a) {
+          if (a.name === 'auto.js') total += (a.download_count || 0);
+        });
       });
-  });
+      try { sessionStorage.setItem(KEY, String(total)); } catch (e) {}
+      render(total);
+    })
+    .catch(function () {
+      // Rate limited, offline, or no releases yet. The count is decoration —
+      // leave it hidden and let the button work as an ordinary link.
+    });
 })();
 </script>
 
